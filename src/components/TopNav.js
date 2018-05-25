@@ -9,7 +9,19 @@ import {
   NavItem,
   NavLink } from 'reactstrap';
 
-export default class Example extends React.Component {
+import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { userLogout } from '../actions/auth.actions'
+
+
+
+class TopNav extends React.Component {
+
+  constructor(props){
+    super(props)
+  }
+
   state = {
     isOpen: false
   }
@@ -18,24 +30,56 @@ export default class Example extends React.Component {
       isOpen: !this.state.isOpen
     });
   }
+
+  handleLogout = (event) => {
+    this.props.userLogout()
+    this.toggle()
+    this.props.history.push('./login')
+
+  }
+
   render() {
     return (
       <div>
         <Navbar color="primary" dark expand="md">
-          <NavbarBrand href="/">ProfileHub</NavbarBrand>
+          <NavbarBrand><Link to='/' style={{color:'white'}}>ProfileHub</Link></NavbarBrand>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="ml-auto" navbar>
-              <NavItem>
-                <a href="#" className="nav-link">Login</a>
-              </NavItem>
-              <NavItem>
-                <a href="#" className="nav-link">Signup</a>
-              </NavItem>
-            </Nav>
+            { !this.props.user.name
+              ? (<Nav className="ml-auto" navbar>
+                  <NavItem>
+                    <Link to="/login" className="nav-link">Login</Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to="/signup" className="nav-link">Signup</Link>
+                  </NavItem>
+                </Nav>)
+              : (<Nav className="ml-auto" navbar>
+                  <NavItem>
+                    <Link to="/login" className="nav-link" onClick={this.handleLogout}>Log out</Link>
+                  </NavItem>
+                </Nav>)
+              }
           </Collapse>
         </Navbar>
       </div>
     );
   }
 }
+
+
+
+function mapStateToProps(state) {
+  return {
+    user: state.auth.user
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    userLogout: bindActionCreators(userLogout, dispatch)
+
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopNav)

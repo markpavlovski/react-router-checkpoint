@@ -5,9 +5,12 @@ import {
   Col
 } from 'reactstrap'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
+
 
 const UserProfile = (props) => {
   console.log('up props', props)
+  if (!props.user.name) props.history.push('/login')
   return (
     <div>
       <Container>

@@ -13,6 +13,8 @@ import {
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { userLogin } from '../actions/auth.actions'
+import { BrowserRouter, Route, Switch, Redirect, Link } from 'react-router-dom'
+
 
 class Login extends Component {
   state = {
@@ -20,7 +22,14 @@ class Login extends Component {
     password: ''
   }
 
+  handleSubmit(event){
+    event.preventDefault()
+    this.props.userLogin({email: event.target.email.value, password: event.target.password.value})
+    this.props.history.push('./profile')
+  }
+
   render() {
+    if (this.props.user.name) this.props.history.push('/profile')
     return (
       <Container className="main-wrapper">
         <Row style={{ marginTop: '15vh' }}>
@@ -32,7 +41,7 @@ class Login extends Component {
               boxShadow: '3px 3px 47px 0px rgba(0,0,0,0.5)'
             }}
           >
-            <Form>
+            <Form onSubmit={event => this.handleSubmit(event)}>
               <FormGroup>
                 <Label for="email-field">Email</Label>
                 <Input
@@ -63,7 +72,7 @@ class Login extends Component {
               <Button className="mr-3" type="submit" color="primary">
                 Submit
               </Button>
-              <a href="/signup">Not a member?</a>
+              <Link to='/signup'>Not a member?</Link>
             </Form>
           </Col>
         </Row>
@@ -74,13 +83,15 @@ class Login extends Component {
 
 function mapStateToProps(state) {
   return {
-    showLoginError: state.auth.showLoginError
+    showLoginError: state.auth.showLoginError,
+    user: state.auth.user
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     userLogin: bindActionCreators(userLogin, dispatch)
+
   }
 }
 
